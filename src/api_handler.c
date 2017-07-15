@@ -24,7 +24,8 @@ static char* _make_wlist_call(char *arg);
  *      JsonNode array of all the tasks in JsonNode objects\n
  *      NULL if API call failed
  */
-JsonNode* a_get_inbox_tasks() {
+JsonNode* a_get_inbox_tasks()
+{
     char *jsonString;
     if ((jsonString = _make_wlist_call("inbox:tasks")) == NULL)
         return NULL;
@@ -41,7 +42,8 @@ JsonNode* a_get_inbox_tasks() {
  *      Json string formatted response from wlist\n
  *      NULL if response failed
  */
-static char* _make_wlist_call(char *arg) {
+static char* _make_wlist_call(char *arg)
+{
     // Todo: debug printf("Debug: Reached _make_wlist_call.\n");
     char* wlist_bin = "./extlib/wlist/bin/wlist";
     char* reroute_stderr = "2>/dev/null";
@@ -51,7 +53,7 @@ static char* _make_wlist_call(char *arg) {
                       + strlen(reroute_stderr)
                       + 2 /* Two spaces */
                       + 1; /* null byte */
-    char* command = (char *) malloc(command_len);
+    char* command = (char *) malloc(command_len); // Todo: Support UTF-8/Unicode
     snprintf(command, command_len, "%s %s %s", wlist_bin, arg, reroute_stderr);
 
     FILE *fp;

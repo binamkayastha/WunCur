@@ -44,7 +44,8 @@ static int _refresh(WINDOW *win) {
  *
  * @return 1 on success
  */
-int v_init() {
+int v_init()
+{
     initscr();
     cbreak(); // Change to raw() laters. Raw controlls all user input
     noecho();
@@ -68,25 +69,29 @@ int v_init() {
 }
 
 /** Initializes a window on the left to hold project lists. */
-static void _init_proj_view(int width) {
+static void _init_proj_view(int width)
+{
     proj_view = newwin(LINES, width, 0, 0);
     _print_loading(proj_view);
 }
 
 /** Initializes the center window for the list of tasks. */
-static void _init_task_view(int left_pad) {
+static void _init_task_view(int left_pad)
+{
     task_view = newwin(LINES, COLS-left_pad, 0, left_pad);
     _print_loading(task_view);
 }
 
 /** Prints a loading string on the given window. */
-static void _print_loading(WINDOW *win) {
+static void _print_loading(WINDOW *win)
+{
     mvwprintw(win, 1, 1, "Loading ...\n");
     _refresh(win);
 }
 
 /* Prints error on the screen */
-void v_display_error(char* message) {
+void v_display_error(char* message)
+{
     // Todo: Change this to a pop up
     mvwprintw(task_view, 1, 1, message);
     _refresh(task_view);
@@ -97,7 +102,8 @@ void v_display_error(char* message) {
  *
  * @param listOfTask A json array to be printed
  */
-void v_display_inbox(JsonNode *listOfTasks) {
+void v_display_inbox(JsonNode *listOfTasks)
+{
     // Todo: debug printw("Debug: Reached v_display_inbox\n");
     JsonNode *task;
     int counter = 1;
