@@ -18,5 +18,8 @@ view.o: view.h
 json.o: extlib/json.h
 	gcc -g -c extlib/json.c
 
+document:
+	doxygen ../Doxyfile
+
 clean:
 	rm -f wuncur *.o

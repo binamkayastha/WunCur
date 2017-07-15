@@ -1,2 +1,8 @@
+# Binary file
 wuncur
+
+# link files
 *.o
+
+# documentation folder
+documentation
