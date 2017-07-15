@@ -1,0 +1,9 @@
+#!/usr/bin/env ruby
+require "#{File.dirname(__FILE__)}/../lib/wlist.rb"
+
+parse_options
+data = JSON.parse(ARGF.read)
+#data['list_id'] = get_inbox_id unless data['list_id']
+data['title'] = OPTIONS[:title] unless data['title']
+response = post("tasks", data)
+puts JSON.pretty_generate(response)
