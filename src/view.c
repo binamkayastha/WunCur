@@ -1,13 +1,25 @@
-#include <stdio.h>
-#include <stdlib.h>
+/**
+ * Handles the ncurses portion of the program.
+ *
+ * The view has two main jobs:
+ * 1) Updates the view based on what the controller wants.
+ * 2) Handles user input, and calls event functions in the controller.
+ *
+ * LINES and COLS are ncurses macros of how high and wide the window is.
+ */
+
 #include <ncurses.h>
+#include <stdlib.h>
+#include <stdio.h>
 #include "extlib/json.h"
 #include "view.h"
 
+/* Private function declarations */
 static void _init_proj_view(int width);
 static void _init_task_view(int left_pad);
 static void _print_loading(WINDOW *win);
 
+/* Private variables */
 static WINDOW *proj_view;
 static WINDOW *task_view;
 
@@ -25,6 +37,13 @@ static int _refresh(WINDOW *win) {
     wrefresh(win);
 }
 
+/**
+ * Initializes the view with inbox selected.
+ *
+ * Calls initialization functions to begin ncurses, and setup the windows.
+ *
+ * @return 1 on success
+ */
 int v_init() {
     initscr();
     cbreak(); // Change to raw() laters. Raw controlls all user input
@@ -48,39 +67,46 @@ int v_init() {
     return 1;
 }
 
+/* Initializes a window on the left to hold project lists. */
 static void _init_proj_view(int width) {
     proj_view = newwin(LINES, width, 0, 0);
     _print_loading(proj_view);
 }
 
+/* Initializes the center window for the list of tasks. */
 static void _init_task_view(int left_pad) {
     task_view = newwin(LINES, COLS-left_pad, 0, left_pad);
     _print_loading(task_view);
 }
 
+/* Prints a loading string on the given window. */
 static void _print_loading(WINDOW *win) {
     mvwprintw(win, 1, 1, "Loading ...\n");
     _refresh(win);
 }
 
+/**
+ * Prints all the tasks in bold from the inbox list into the task_view.
+ *
+ * @param listOfTask A json array to be printed
+ */
 int v_display_inbox(JsonNode *listOfTasks) {
-    //printw("Debug: Reached v_display_inbox\n");
+    // Todo: debug printw("Debug: Reached v_display_inbox\n");
     JsonNode *task;
     int counter = 1;
     wattron(task_view, A_BOLD);
     json_foreach(task, listOfTasks) {
         mvwprintw(
             task_view, counter, 1,
-            "%d: %s\n",
-            counter, json_find_member(task, "title")->string_
+            "%d: %s\n", counter, json_find_member(task, "title")->string_
         );
         counter++;
     }
     wattroff(task_view, A_BOLD);
-    //chgat(10, A_REVERSE, 1, NULL);
     _refresh(task_view);
 }
 
+/* Close out of ncurses, and return 1 for success */
 int v_end() {
     getch();
     endwin();
