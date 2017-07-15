@@ -4,16 +4,24 @@
 #include "extlib/json.h"
 #include "view.h"
 
-void _init_proj_view(int width);
-void _init_task_view(int left_pad);
-void _print_loading(WINDOW *win);
+static void _init_proj_view(int width);
+static void _init_task_view(int left_pad);
+static void _print_loading(WINDOW *win);
 
 static WINDOW *proj_view;
 static WINDOW *task_view;
 
-int _refresh(WINDOW *win) {
+/**
+ * Draws a box and refreshes the window.
+ *
+ * A box needs to be redrawn
+ *
+ * @param win Window to refresh
+ */
+static int _refresh(WINDOW *win) {
+    // Todo: potentially choose thicker borders
+    // wborder(task_view, '|', '|', '-', '-', '+', '+', '+', '+');
     box(win, 0 , 0);
-    //wborder(task_view, '|', '|', '-', '-', '+', '+', '+', '+');
     wrefresh(win);
 }
 
@@ -40,17 +48,17 @@ int v_init() {
     return 1;
 }
 
-void _init_proj_view(int width) {
+static void _init_proj_view(int width) {
     proj_view = newwin(LINES, width, 0, 0);
     _print_loading(proj_view);
 }
 
-void _init_task_view(int left_pad) {
+static void _init_task_view(int left_pad) {
     task_view = newwin(LINES, COLS-left_pad, 0, left_pad);
     _print_loading(task_view);
 }
 
-void _print_loading(WINDOW *win) {
+static void _print_loading(WINDOW *win) {
     mvwprintw(win, 1, 1, "Loading ...\n");
     _refresh(win);
 }

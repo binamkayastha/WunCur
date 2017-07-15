@@ -8,11 +8,12 @@
 static JsonNode *listOfTasks;
 
 /**
- * The inital function called when program starts.
- * returns: 1 if initialization sucessfull, 0 if  not
+ * The initial function called when program starts.
+ *
+ * returns: 1 if initialization successful, 0 if not
  */
 int c_init() {
-    //printf("Debug: Reached controler intialization.\n");
+    //printf("Debug: Reached controller initialization.\n");
     if(!v_init()) {
         return 0;
     }
