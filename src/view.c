@@ -85,12 +85,19 @@ static void _print_loading(WINDOW *win) {
     _refresh(win);
 }
 
+/* Prints error on the screen */
+void v_display_error(char* message) {
+    // Todo: Change this to a pop up
+    mvwprintw(task_view, 1, 1, message);
+    _refresh(task_view);
+}
+
 /**
  * Prints all the tasks in bold from the inbox list into the task_view.
  *
  * @param listOfTask A json array to be printed
  */
-int v_display_inbox(JsonNode *listOfTasks) {
+void v_display_inbox(JsonNode *listOfTasks) {
     // Todo: debug printw("Debug: Reached v_display_inbox\n");
     JsonNode *task;
     int counter = 1;

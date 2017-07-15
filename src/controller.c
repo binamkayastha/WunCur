@@ -21,14 +21,17 @@ static JsonNode *listOfTasks;
 /**
  * The initial function called when program starts.
  *
- * returns: 1 if initialization successful, 0 if not
+ * @return
+ *      1 if initialization successful \n
+ *      0 if initialization failed
  */
 int c_init() {
     // Todo: debug printf("Debug: Reached controller initialization.\n");
     if(!v_init()) {
         return 0;
     }
-    listOfTasks = a_get_inbox_tasks();
+    if((listOfTasks = a_get_inbox_tasks()) == NULL)
+        v_display_error("Failed to get inbox tasks\n");
     v_display_inbox(listOfTasks);
 
     // Todo: Take the JsonNode and throw it into the model

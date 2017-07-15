@@ -19,7 +19,7 @@
  * @return 0 for success, and 1 for failure
  */
 int main() {
-    if(c_init()) {
+    if (c_init()) {
         return 0; // Success
     }
     return 1;

@@ -17,9 +17,17 @@
 /* Private function declarations */
 static char* _make_wlist_call(char *arg);
 
-/** Returns a json node struct containing all tasks from the inbox */
+/**
+ * Returns a json node struct containing all tasks from the inbox
+ *
+ * @return
+ *      JsonNode array of all the tasks in JsonNode objects\n
+ *      NULL if API call failed
+ */
 JsonNode* a_get_inbox_tasks() {
-    char *jsonString = _make_wlist_call("inbox:tasks");
+    char *jsonString;
+    if ((jsonString = _make_wlist_call("inbox:tasks")) == NULL)
+        return NULL;
     return json_decode(jsonString);
 }
 
@@ -29,19 +37,24 @@ JsonNode* a_get_inbox_tasks() {
  * Relies on the fact that the wlist binary is in ./extlib/wlist/bin/wlist
  *
  * @param arg The values passed into wlist.
- * @return A response in json string format from wlist.
+ * @return
+ *      Json string formatted response from wlist\n
+ *      NULL if response failed
  */
 static char* _make_wlist_call(char *arg) {
     // Todo: debug printf("Debug: Reached _make_wlist_call.\n");
+    char* wlist_bin = "./extlib/wlist/bin/wlist";
+    char* reroute_stderr = "2>/dev/null";
+
+    int command_len = strlen(wlist_bin)
+                      + strlen(arg)
+                      + strlen(reroute_stderr)
+                      + 2 /* Two spaces */
+                      + 1; /* null byte */
+    char* command = (char *) malloc(command_len);
+    snprintf(command, command_len, "%s %s %s", wlist_bin, arg, reroute_stderr);
+
     FILE *fp;
-    int status;
-    char path[2048];
-
-    // Allocate enough memory for base command + arg + null byte
-    char* command = (char *) malloc(26 + strlen(arg));
-    strcpy(command, "./extlib/wlist/bin/wlist ");
-    strncat(command, arg, strlen(arg));
-
     fp = popen(command, "r");
     if (fp == NULL) {
         printf("Err\n");
@@ -54,13 +67,16 @@ static char* _make_wlist_call(char *arg) {
     char *response_buff = (char *) malloc(1);
     *response_buff = '\0';
 
-    while (getline(&line_buff, &nbytes, fp) > 0){
+    while (getline(&line_buff, &nbytes, fp) > 0) {
         size_t new_length = strlen(response_buff) + strlen(line_buff);
         response_buff = (char *) realloc(response_buff, new_length);
         strcat(response_buff, line_buff);
     }
     free(line_buff);
-
     pclose(fp);
+
+    if (*response_buff == '\0')
+        return NULL;
+
     return response_buff;
 }
