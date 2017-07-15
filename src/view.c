@@ -67,19 +67,19 @@ int v_init() {
     return 1;
 }
 
-/* Initializes a window on the left to hold project lists. */
+/** Initializes a window on the left to hold project lists. */
 static void _init_proj_view(int width) {
     proj_view = newwin(LINES, width, 0, 0);
     _print_loading(proj_view);
 }
 
-/* Initializes the center window for the list of tasks. */
+/** Initializes the center window for the list of tasks. */
 static void _init_task_view(int left_pad) {
     task_view = newwin(LINES, COLS-left_pad, 0, left_pad);
     _print_loading(task_view);
 }
 
-/* Prints a loading string on the given window. */
+/** Prints a loading string on the given window. */
 static void _print_loading(WINDOW *win) {
     mvwprintw(win, 1, 1, "Loading ...\n");
     _refresh(win);

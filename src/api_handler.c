@@ -17,7 +17,7 @@
 /* Private function declarations */
 static char* _make_wlist_call(char *arg);
 
-/* Returns a json node struct containing all tasks from the inbox */
+/** Returns a json node struct containing all tasks from the inbox */
 JsonNode* a_get_inbox_tasks() {
     char *jsonString = _make_wlist_call("inbox:tasks");
     return json_decode(jsonString);
