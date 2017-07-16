@@ -37,6 +37,6 @@ int c_init()
         v_display_inbox(listOfTasks);
     // Todo: Take the JsonNode and throw it into the model
 
-    v_end();
+    v_exit();
     return 1;
 }

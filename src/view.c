@@ -15,13 +15,14 @@
 #include "view.h"
 
 /* Private function declarations */
-static void _init_proj_view(int width);
-static void _init_task_view(int left_pad);
+static void _init_colors();
+static void _init_proj_win(int width);
+static void _init_task_win(int left_pad);
 static void _print_loading(WINDOW *win);
 
 /* Private variables */
-static WINDOW *proj_view;
-static WINDOW *task_view;
+static WINDOW *proj_win;
+static WINDOW *task_win;
 
 /**
  * Draws a box and refreshes the window.
@@ -32,7 +33,7 @@ static WINDOW *task_view;
  */
 static int _refresh(WINDOW *win) {
     // Todo: potentially choose thicker borders
-    // wborder(task_view, '|', '|', '-', '-', '+', '+', '+', '+');
+    // wborder(task_win, '|', '|', '-', '-', '+', '+', '+', '+');
     box(win, 0 , 0);
     wrefresh(win);
 }
@@ -50,36 +51,41 @@ int v_init()
     cbreak(); // Change to raw() laters. Raw controlls all user input
     noecho();
     keypad(stdscr, TRUE); // Allow capturing of Fn keys and arrow keys
+    _init_colors();
 
-    use_default_colors();
+    refresh();
+
+    /* proj_win is on the left side of task_win */
+    int proj_win_size = 20;
+    _init_proj_win(proj_win_size);
+    _init_task_win(proj_win_size);
+
+    return 1;
+}
+
+/** Initialize colors for ncurses */
+static void _init_colors()
+{
+    use_default_colors(); /* Supports transparency */
     start_color();
     init_color(COLOR_WHITE, 225, 255, 255);
     init_color(COLOR_BLUE, 225, 242, 254);
     init_pair(1, COLOR_BLACK, COLOR_WHITE);
     init_pair(2, COLOR_BLACK, COLOR_BLUE);
-
-    refresh();
-
-    /* proj_view is on the left side of task_view */
-    int proj_view_size = 20;
-    _init_proj_view(proj_view_size);
-    _init_task_view(proj_view_size);
-
-    return 1;
 }
 
 /** Initializes a window on the left to hold project lists. */
-static void _init_proj_view(int width)
+static void _init_proj_win(int width)
 {
-    proj_view = newwin(LINES, width, 0, 0);
-    _print_loading(proj_view);
+    proj_win = newwin(LINES, width, 0, 0);
+    _print_loading(proj_win);
 }
 
 /** Initializes the center window for the list of tasks. */
-static void _init_task_view(int left_pad)
+static void _init_task_win(int left_pad)
 {
-    task_view = newwin(LINES, COLS-left_pad, 0, left_pad);
-    _print_loading(task_view);
+    task_win = newwin(LINES, COLS-left_pad, 0, left_pad);
+    _print_loading(task_win);
 }
 
 /** Prints a loading string on the given window. */
@@ -93,12 +99,12 @@ static void _print_loading(WINDOW *win)
 void v_display_error(char* message)
 {
     // Todo: Change this to a pop up
-    mvwprintw(task_view, 1, 1, message);
-    _refresh(task_view);
+    mvwprintw(task_win, 1, 1, message);
+    _refresh(task_win);
 }
 
 /**
- * Prints all the tasks in bold from the inbox list into the task_view.
+ * Prints all the tasks in bold from the inbox list into the task_win.
  *
  * @param listOfTask A json array to be printed
  */
@@ -107,20 +113,20 @@ void v_display_inbox(JsonNode *listOfTasks)
     // Todo: debug printw("Debug: Reached v_display_inbox\n");
     JsonNode *task;
     int counter = 1;
-    wattron(task_view, A_BOLD);
+    wattron(task_win, A_BOLD);
     json_foreach(task, listOfTasks) {
         mvwprintw(
-            task_view, counter, 1,
+            task_win, counter, 1,
             "%d: %s\n", counter, json_find_member(task, "title")->string_
         );
         counter++;
     }
-    wattroff(task_view, A_BOLD);
-    _refresh(task_view);
+    wattroff(task_win, A_BOLD);
+    _refresh(task_win);
 }
 
 /* Close out of ncurses, and return 1 for success */
-int v_end() {
+int v_exit() {
     getch();
     endwin();
     return 1;
