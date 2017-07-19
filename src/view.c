@@ -12,10 +12,12 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include "extlib/json.h"
+#include "logger.h"
 #include "view.h"
 
 /* Private function declarations */
 static void _init_colors();
+static void _init_log_win(int log_win_height);
 static void _init_proj_win(int width);
 static void _init_task_win(int left_pad);
 static void _print_loading(WINDOW *win);
@@ -23,6 +25,7 @@ static void _print_loading(WINDOW *win);
 /* Private variables */
 static WINDOW *proj_win;
 static WINDOW *task_win;
+static WINDOW *log_win;
 
 /**
  * Draws a box and refreshes the window.
@@ -36,6 +39,8 @@ static int _refresh(WINDOW *win) {
     // wborder(task_win, '|', '|', '-', '-', '+', '+', '+', '+');
     box(win, 0 , 0);
     wrefresh(win);
+    redrawwin(log_win);
+    wrefresh(log_win);
 }
 
 /**
@@ -55,7 +60,10 @@ int v_init()
 
     refresh();
 
-    /* proj_win is on the left side of task_win */
+    /* proj_win is on the left side of task_win*/
+    int log_win_size = 10;
+    _init_log_win(log_win_size); /* log win MUST be initialized first. */
+    // Todo: Handle missing_log win in _refresh(WINDOW *win)
     int proj_win_size = 20;
     _init_proj_win(proj_win_size);
     _init_task_win(proj_win_size);
@@ -72,6 +80,13 @@ static void _init_colors()
     init_color(COLOR_BLUE, 225, 242, 254);
     init_pair(1, COLOR_BLACK, COLOR_WHITE);
     init_pair(2, COLOR_BLACK, COLOR_BLUE);
+}
+
+/** Initializes a window on the bottom to log errors */
+static void _init_log_win(int log_win_height)
+{
+    log_win = newwin(log_win_height, COLS, LINES-log_win_height, 0);
+    scrollok(log_win, TRUE);
 }
 
 /** Initializes a window on the left to hold project lists. */
@@ -95,12 +110,16 @@ static void _print_loading(WINDOW *win)
     _refresh(win);
 }
 
-/* Prints error on the screen */
-void v_display_error(char* message)
+/* Prints log on the screen. */
+void v_display_log(char *log_level, char *msg)
 {
-    // Todo: Change this to a pop up
-    mvwprintw(task_win, 1, 1, message);
-    _refresh(task_win);
+    // If ncurses has not been initialized yet
+    if (stdscr == NULL) {
+        printf("%s\n", msg);
+    } else {
+        wprintw(log_win, "%s: %s\n", log_level, msg);
+        wrefresh(log_win);
+    }
 }
 
 /**
@@ -110,7 +129,7 @@ void v_display_error(char* message)
  */
 void v_display_inbox(JsonNode *listOfTasks)
 {
-    // Todo: debug printw("Debug: Reached v_display_inbox\n");
+    l_log(DEBUG, "Reached v_display_inbox.");
     JsonNode *task;
     int counter = 1;
     wattron(task_win, A_BOLD);
@@ -123,6 +142,7 @@ void v_display_inbox(JsonNode *listOfTasks)
     }
     wattroff(task_win, A_BOLD);
     _refresh(task_win);
+    l_log(DEBUG, "Drew Inbox tasks.");
 }
 
 /* Close out of ncurses, and return 1 for success */

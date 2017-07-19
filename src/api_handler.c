@@ -13,6 +13,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "extlib/json.h"
+#include "logger.h"
 
 /* Private function declarations */
 static char* _make_wlist_call(char *arg);
@@ -44,7 +45,7 @@ JsonNode* a_get_inbox_tasks()
  */
 static char* _make_wlist_call(char *arg)
 {
-    // Todo: debug printf("Debug: Reached _make_wlist_call.\n");
+    l_log(DEBUG, "Reached _make_wlist_call in api_handler.");
     char* wlist_bin = "./extlib/wlist/bin/wlist";
     char* reroute_stderr = "2>/dev/null";
 

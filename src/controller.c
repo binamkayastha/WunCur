@@ -13,6 +13,7 @@
 #include "extlib/json.h"
 #include "api_handler.h"
 #include "controller.h"
+#include "logger.h"
 #include "view.h"
 
 /* Private function declarations */
@@ -27,12 +28,12 @@ static JsonNode *listOfTasks;
  */
 int c_init()
 {
-    // Todo: debug printf("Debug: Reached controller initialization.\n");
+    l_log(DEBUG, "Reached controller initialization.");
     if (!v_init())
         return 0;
 
     if ((listOfTasks = a_get_inbox_tasks()) == NULL)
-        v_display_error("Failed to get inbox tasks\n");
+        l_log(ERROR, "Failed to get inbox tasks.");
     else
         v_display_inbox(listOfTasks);
     // Todo: Take the JsonNode and throw it into the model
