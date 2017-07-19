@@ -145,6 +145,30 @@ void v_display_inbox(JsonNode *listOfTasks)
     l_log(DEBUG, "Drew Inbox tasks.");
 }
 
+/**
+ * Prints all the projects list in bold into the proj_win.
+ *
+ * @param listOfProjects A json array or projects to be printed
+ */
+void v_display_projects(JsonNode *listOfProjects)
+{
+    // Although implementation is similar to v_display_inbox, this will not
+    // be refactored, due to the anticipation that the functions will diverge.
+    // I might be wrong, but I'm willing to take on the technical debt
+    JsonNode *project;
+    int counter = 1;
+    wattron(proj_win, A_BOLD);
+    json_foreach(project, listOfProjects) {
+        mvwprintw(
+            proj_win, counter, 1,
+            "%s\n", json_find_member(project, "title")->string_
+        );
+        counter++;
+    }
+    wattroff(proj_win, A_BOLD);
+    _refresh(proj_win);
+}
+
 /* Close out of ncurses, and return 1 for success */
 int v_exit() {
     getch();
