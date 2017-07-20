@@ -13,6 +13,7 @@
 #include <stdio.h>
 #include "extlib/json.h"
 #include "logger.h"
+#include "controller.h"
 #include "view.h"
 
 /* Private function declarations */
@@ -169,9 +170,14 @@ void v_display_projects(JsonNode *listOfProjects)
     _refresh(proj_win);
 }
 
-/* Close out of ncurses, and return 1 for success */
-int v_exit() {
-    getch();
+/** Listens for user input. */
+void v_listen() {
+    while(1)
+        if(getch() == 'q')
+            c_event_exit();
+}
+
+/** Close out of ncurses, and return 1 for success */
+void v_exit() {
     endwin();
-    return 1;
 }

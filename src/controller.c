@@ -10,6 +10,7 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include "extlib/json.h"
 #include "api_handler.h"
 #include "controller.h"
@@ -31,7 +32,7 @@ int c_init()
 {
     l_log(DEBUG, "Reached controller initialization.");
     if (!v_init())
-        return 0;
+        exit(1);
 
     if ((listOfTasks = a_get_inbox_tasks()) == NULL)
         l_log(ERROR, "Failed to get inbox tasks.");
@@ -45,6 +46,18 @@ int c_init()
 
     // Todo: Take the JsonNode and throw it into the model
 
+    // Listen for character inputs from view, because only view should have
+    //  access to user input via ncurses.
+    v_listen();
+
+    l_log(ERROR, "Exited view listen loop");
+    exit(1);
+}
+
+/** Logs and exits out of the view. */
+void c_event_exit()
+{
+    l_log(DEBUG, "Reached c_event_exit().");
     v_exit();
-    return 1;
+    exit(0);
 }
