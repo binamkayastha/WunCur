@@ -38,7 +38,9 @@ static JsonNode *_get_JsonNode_for(char *cmd)
     char *jsonString;
     if ((jsonString = _make_wlist_call(cmd)) == NULL)
         return NULL;
-    return json_decode(jsonString);
+    JsonNode *decoded_Json = json_decode(jsonString);
+    free(jsonString);
+    return decoded_Json;
 }
 
 /**
